@@ -1,0 +1,26 @@
+{
+  "name": "hero-scheduler",
+  "version": "1.0.0",
+  "description": "Pick the heroes for the day",
+  "main": "src/handler.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "author": "Malu Decks",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^1.31.1",
+    "axios": "^0.26.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.29.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "express": "^4.17.3",
+    "jest": "^26.6.3"
+  }
+}

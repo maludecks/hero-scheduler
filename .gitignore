@@ -1,0 +1,8 @@
+.DS_STORE
+.vscode
+.aws-sam
+/node_modules
+/etc/*
+!/etc/env.dist.json
+samconfig.toml
+src/node_modules

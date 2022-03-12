@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  DatabaseHost:
+    Description: "Database host url"
+    Type: "String"
+  DatabaseAccessKey:
+    Description: "Access key to database"
+    Type: "String"
+  DatabaseTableName:
+    Description: "Database table name"
+    Type: "String"
+  ConfigIdentifier:
+    Description: "Identifier for configuration"
+    Type: "String"
+  SlackWebhookUrl:
+    Description: "Slack workflow webhook url"
+    Type: "String"
+  WebPageBucketName:
+      Description: "Web page S3 Bucket name"
+      Type: "String"
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Environment:
+      Variables:
+        DB_HOST: !Ref DatabaseHost
+        DB_ACCESS_KEY: !Ref DatabaseAccessKey
+        DB_TABLE_NAME: !Ref DatabaseTableName
+        CONFIG_IDENTIFIER: !Ref ConfigIdentifier
+
+Resources:
+  CurrentHeroSelectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: src/handler.getCurrentSelection
+      MemorySize: 128
+      Timeout: 5
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /heroes/current
+            Method: GET
+
+  PickNewSelectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: src/handler.pickNewSelection
+      MemorySize: 128
+      Timeout: 5
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /heroes/pick
+            Method: GET
+
+  NotifySlackChannelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: src/handler.notifySlackChannel
+      MemorySize: 128
+      Timeout: 15
+      Environment:
+        Variables:
+          SLACK_WEBHOOK_URL: !Ref SlackWebhookUrl
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /heroes/notify
+            Method: GET
+
+  HeroScheduleWebPageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref WebPageBucketName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+    DeletionPolicy: Retain
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref HeroScheduleWebPageBucket
+      PolicyDocument:
+        Id: WebPageAccessPolicyDoc
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref HeroScheduleWebPageBucket
+                - /*
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway API endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  WebPageEndpoint:
+    Description: "Webpage endpoint URL"
+    Value: !GetAtt
+      - HeroScheduleWebPageBucket
+      - WebsiteURL

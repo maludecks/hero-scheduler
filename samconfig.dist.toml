@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "hero-scheduler"
+s3_bucket = ""
+s3_prefix = "hero-scheduler"
+region = ""
+profile = ""
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "DatabaseHost=\"{REPLACE}\" DatabaseAccessKey=\"{REPLACE}\" DatabaseTableName=\"{REPLACE}\" ConfigIdentifier=\"{REPLACE}\" SlackWebhookUrl=\"{REPLACE}\""
+image_repositories = []
