@@ -9,5 +9,5 @@ region = ""
 profile = ""
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "DatabaseHost=\"{REPLACE}\" DatabaseAccessKey=\"{REPLACE}\" DatabaseTableName=\"{REPLACE}\" ConfigIdentifier=\"{REPLACE}\" SlackWebhookUrl=\"{REPLACE}\""
+parameter_overrides = "DatabaseHost=\"{REPLACE}\" DatabaseAccessKey=\"{REPLACE}\" DatabaseTableName=\"{REPLACE}\" ConfigIdentifier=\"{REPLACE}\" SlackWebhookUrl=\"{REPLACE}\" WithWebPage=\"{true|false}\" WebPageBucketName=\"{REPLACE}\""
 image_repositories = []

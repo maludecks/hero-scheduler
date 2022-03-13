@@ -2,49 +2,45 @@
 
 const _ = require('lodash');
 const superheroRepository = require('./superheroRepository');
-const EmptyMembersListError = require('../errors/emptyMembersListError');
-const NoSuperheroSelectedError = require('../errors/noSuperheroSelectedError');
 
 async function current() {
-  const { currentSelection, lastModified } = await superheroRepository.fetchConfiguration();
+  let currentSelection = await superheroRepository.fetchCurrentHeroes();
 
   if (currentSelection.length === 0) {
-    throw new NoSuperheroSelectedError();
+    currentSelection = pick();
   }
 
-  return {
-    currentSelection,
-    lastModified
-  };
+  return currentSelection;
 }
 
 async function pick() {
-  const {
-    membersList,
-    currentSelection,
-    numberOfHeroes
-  } = await superheroRepository.fetchConfiguration();
+  const { numberOfHeroes } = await superheroRepository.fetchConfiguration();
+  const availableMembers = await superheroRepository.fetchAvailableMembers();
 
-  if (membersList.length === 0) {
-    throw new EmptyMembersListError();
+  if (availableMembers.length === 0) {
+    throw new Error('List of members is empty');
   }
 
   const newSelection = _.sampleSize(
-    membersList.filter(hero => !currentSelection.includes(hero)),
+    availableMembers,
     numberOfHeroes
   );
 
-  await superheroRepository.saveNewSelection(newSelection);
+  await superheroRepository.removeCurrentHeroes();
+  await superheroRepository.saveNewHeroes(newSelection);
 
   return newSelection;
 }
 
-async function setup(users, numberOfHeroes) {
-  if (users.length === 0) {
-    throw new EmptyMembersListError();
+async function setup(members, numberOfHeroes) {
+  if (members.length === 0) {
+    throw new Error(`List of members can't be empty`);
   }
 
-  return await superheroRepository.saveConfiguration(users, numberOfHeroes);
+  return Promise.all(
+    superheroRepository.saveConfiguration(numberOfHeroes),
+    superheroRepository.saveMembers(numberOfHeroes)
+  );
 }
 
 module.exports = {

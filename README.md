@@ -3,7 +3,7 @@
 App which picks random* members (a.k.a heroes) and assigns them to take care of any reported tasks for the day. Hero scheduler consists of an API that interacts with a [Supabase database](https://supabase.com/) and a simple webpage. In order to integrate it with Slack, a [Slack Webhook Workflow](https://slack.com/help/articles/360041352714-Create-more-advanced-workflows-using-webhooks) needs to be set up
 
 ## Run locally
-To run the local enviroment you'll need `aws-sam-sdk` installed.
+To run the local enviroment you'll need [aws-sam-sdk](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) and [supabase/cli](https://github.com/supabase/cli) installed.
 
 The API runs locally through `sam local start-api`. Start the API locally with the script `install-development`:
 ```sh

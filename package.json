@@ -10,13 +10,19 @@
     "test": "jest",
     "lint": "eslint ."
   },
+  "jest": {
+    "testMatch": [
+      "*.test.js"
+    ]
+  },
   "author": "Malu Decks",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^1.31.1",
     "axios": "^0.26.1",
     "lodash": "^4.17.15",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "nock": "^13.2.4"
   },
   "devDependencies": {
     "eslint": "^7.2.0",

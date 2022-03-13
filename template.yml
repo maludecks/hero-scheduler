@@ -9,18 +9,28 @@ Parameters:
   DatabaseAccessKey:
     Description: "Access key to database"
     Type: "String"
-  DatabaseTableName:
-    Description: "Database table name"
-    Type: "String"
   ConfigIdentifier:
     Description: "Identifier for configuration"
     Type: "String"
   SlackWebhookUrl:
     Description: "Slack workflow webhook url"
     Type: "String"
-  WebPageBucketName:
-      Description: "Web page S3 Bucket name"
+  WithWebPage:
+      Description: "Flag to determine if a web page bucket should be created"
       Type: "String"
+      Default: false
+      AllowedValues:
+        - true
+        - false
+      ConstraintDescription: "Value should be true or false"
+  WebPageBucketName:
+    Description: "Web page S3 Bucket name"
+    Type: "String"
+
+Conditions:
+  CreateWithWebPage: !Equals
+    - !Ref WithWebPage
+    - true
 
 Globals:
   Function:
@@ -29,7 +39,6 @@ Globals:
       Variables:
         DB_HOST: !Ref DatabaseHost
         DB_ACCESS_KEY: !Ref DatabaseAccessKey
-        DB_TABLE_NAME: !Ref DatabaseTableName
         CONFIG_IDENTIFIER: !Ref ConfigIdentifier
 
 Resources:
@@ -78,17 +87,34 @@ Resources:
             Path: /heroes/notify
             Method: GET
 
+  PickAndNotifySlackChannelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: src/handler.pickAndNotify
+      MemorySize: 128
+      Timeout: 15
+      Environment:
+        Variables:
+          SLACK_WEBHOOK_URL: !Ref SlackWebhookUrl
+      Events:
+        StartScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 8 ? * MON-FRI *)
+
   HeroScheduleWebPageBucket:
     Type: AWS::S3::Bucket
+    Condition: CreateWithWebPage
     Properties:
       BucketName: !Ref WebPageBucketName
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
-    DeletionPolicy: Retain
 
-  BucketPolicy:
+  WebPageBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    Condition: CreateWithWebPage
     Properties:
       Bucket: !Ref HeroScheduleWebPageBucket
       PolicyDocument:
@@ -111,6 +137,7 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   WebPageEndpoint:
     Description: "Webpage endpoint URL"
+    Condition: CreateWithWebPage
     Value: !GetAtt
       - HeroScheduleWebPageBucket
       - WebsiteURL
