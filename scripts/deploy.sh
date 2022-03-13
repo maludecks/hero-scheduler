@@ -4,8 +4,8 @@
 : ${2?"Usage: $0 AWS_PROFILE AWS_REGION WEBPAGE_S3_BUCKET_NAME"}
 : ${3?"Usage: $0 AWS_PROFILE AWS_REGION WEBPAGE_S3_BUCKET_NAME"}
 
-echo "- cleaning-up development env files"
-rm -rf src/node_modules
+echo "- compiling Typescript"
+npm run compile
 
 echo "- building package"
 sam build --manifest package.json

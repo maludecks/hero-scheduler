@@ -1,11 +1,21 @@
-'use strict';
+import { APIGatewayProxyResult } from 'aws-lambda';
+import SlackService from './services/slackService';
+import ResponseBuilder from './utils/responseBuilder';
+import SelectionDateValidator from './utils/selectionDateValidator';
+import SuperheroRepository from './services/superheroRepository';
+import SuperheroService from './services/superheroService';
 
-const superheroService = require('./services/superheroService');
-const slackService = require('./services/slackService');
-const responseBuilder = require('./utils/responseBuilder');
-const selectionDateValidator = require('./utils/selectionDateValidator');
+const slackService = new SlackService(process.env.SLACK_WEBHOOK_URL || '');
+const responseBuilder = new ResponseBuilder();
+const selectionDateValidator = new SelectionDateValidator();
+const superheroRepository = new SuperheroRepository(
+  process.env.DB_HOST || '',
+  process.env.DB_ACCESS_KEY || '',
+  process.env.CONFIG_IDENTIFIER || ''
+);
+const superheroService = new SuperheroService(superheroRepository);
 
-const getCurrentSelection = async () => {
+export const getCurrentSelection = async (): Promise<APIGatewayProxyResult> => {
   try {
     const currentSelection = await superheroService.current();
 
@@ -17,7 +27,7 @@ const getCurrentSelection = async () => {
 
     return pickNewSelection();
   } catch (e) {
-    console.error(`Unable to find current selection: ${e.stack}`);
+    console.error(`Unable to find current selection: ${<Error>e}`);
 
     return responseBuilder.internalError({
       error: 'Unable to find current selection of heroes'
@@ -25,7 +35,7 @@ const getCurrentSelection = async () => {
   }
 };
 
-const pickNewSelection = async () => {
+export const pickNewSelection = async (): Promise<APIGatewayProxyResult> => {
   try {
     const selectedHeroes = await superheroService.pick();
 
@@ -33,7 +43,7 @@ const pickNewSelection = async () => {
       heroes: selectedHeroes.map(hero => hero.slackHandle)
     });
   } catch (e) {
-    console.error(`Unable to pick new selection: ${e.stack}`);
+    console.error(`Unable to pick new selection: ${<Error>e}`);
 
     return responseBuilder.internalError({
       error: 'Unable to pick new heroes'
@@ -41,7 +51,7 @@ const pickNewSelection = async () => {
   }
 };
 
-const notifySlackChannel = async () => {
+export const notifySlackChannel = async (): Promise<APIGatewayProxyResult> => {
   try {
     const currentSelection = await superheroService.current();
 
@@ -49,7 +59,7 @@ const notifySlackChannel = async () => {
 
     return responseBuilder.noContent();
   } catch (e) {
-    console.error(`Unable to notify slack channel: ${e.stack}`);
+    console.error(`Unable to notify slack channel: ${<Error>e}`);
 
     return responseBuilder.internalError({
       error: 'Unable to notify slack channel'
@@ -57,7 +67,7 @@ const notifySlackChannel = async () => {
   }
 };
 
-const pickAndNotify = async () => {
+export const pickAndNotify = async (): Promise<APIGatewayProxyResult> => {
   try {
     let currentSelection = await superheroService.current();
 
@@ -69,17 +79,10 @@ const pickAndNotify = async () => {
 
     return responseBuilder.noContent();
   } catch (e) {
-    console.error(`Unable to pick and notify slack channel: ${e.stack}`);
+    console.error(`Unable to pick and notify slack channel: ${<Error>e}`);
 
     return responseBuilder.internalError({
       error: 'Unable to pick and notify slack channel'
     });
   }
-};
-
-module.exports = {
-  getCurrentSelection,
-  pickNewSelection,
-  notifySlackChannel,
-  pickAndNotify
 };

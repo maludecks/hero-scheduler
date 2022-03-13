@@ -1,13 +1,13 @@
 .DS_STORE
 .vscode
 .aws-sam
+.dist
 /node_modules
 /etc/*
 !/etc/env.dist.json
 samconfig.toml
 src/node_modules
-
-# Supabase
+dist/
 **/supabase/.branches
 **/supabase/.temp
 **/supabase/.env

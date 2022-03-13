@@ -1,6 +1,4 @@
-'use strict';
-
-const envVars = require('../env.tests');
+import envVars from '../env.tests';
 
 process.env.DB_HOST = envVars.DB_HOST;
 process.env.DB_ACCESS_KEY = envVars.DB_ACCESS_KEY;

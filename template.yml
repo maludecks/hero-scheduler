@@ -45,8 +45,8 @@ Resources:
   CurrentHeroSelectionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src
-      Handler: src/handler.getCurrentSelection
+      CodeUri: .
+      Handler: dist/src/handler.getCurrentSelection
       MemorySize: 128
       Timeout: 5
       Events:
@@ -59,8 +59,8 @@ Resources:
   PickNewSelectionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src
-      Handler: src/handler.pickNewSelection
+      CodeUri: .
+      Handler: dist/src/handler.pickNewSelection
       MemorySize: 128
       Timeout: 5
       Events:
@@ -73,8 +73,8 @@ Resources:
   NotifySlackChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src
-      Handler: src/handler.notifySlackChannel
+      CodeUri: .
+      Handler: dist/src/handler.notifySlackChannel
       MemorySize: 128
       Timeout: 15
       Environment:
@@ -90,8 +90,8 @@ Resources:
   PickAndNotifySlackChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src
-      Handler: src/handler.pickAndNotify
+      CodeUri: .
+      Handler: dist/src/handler.pickAndNotify
       MemorySize: 128
       Timeout: 15
       Environment:
