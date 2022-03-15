@@ -1,16 +1,17 @@
+'use strict';
+
 module.exports = {
-  "env": {
-    "node": true,
-    "browser": true,
-    "commonjs": true,
-    "es2020": true,
-    "jest": true
+  env: {
+    node: true,
   },
-  "extends": "eslint:recommended",
-  "parserOptions": {
-    "ecmaVersion": 11
-  },
-  "rules": {
-    "no-useless-escape": "off"
-  }
+  ignorePatterns: ['**/*.js'],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  overrides: [
+    {
+      files: ['*.test.ts'],
+      rules: { '@typescript-eslint/no-explicit-any': 0 },
+    },
+  ],
 };

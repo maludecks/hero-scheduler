@@ -1,16 +1,11 @@
-'use strict';
-
-const moment = require('moment');
-const nock = require('nock');
-const handlers = require('../../src/handler');
-const supabaseHelper = require('../helpers/supabaseHelper');
-const envVars = require('../env.tests');
+import * as moment from 'moment';
+import * as nock from 'nock';
+import * as handlers from '../../src/handler';
+import envVars from '../env.tests';
+import SupabaseHelper from '../helpers/supabaseHelper';
 
 describe('Hero Scheduler', () => {
-  const event = {
-    body: JSON.stringify({}),
-    headers: {}
-  };
+  const supabaseHelper = new SupabaseHelper();
 
   beforeEach(async () => {
     await supabaseHelper.cleanUp();
@@ -25,7 +20,7 @@ describe('Hero Scheduler', () => {
     await supabaseHelper.addMembers();
     await supabaseHelper.selectHero('U000001');
 
-    const res = await handlers.getCurrentSelection(event);
+    const res = await handlers.getCurrentSelection();
 
     const expectedRes = {
       heroes: ['john']
@@ -40,7 +35,7 @@ describe('Hero Scheduler', () => {
     await supabaseHelper.addMembers();
     await supabaseHelper.selectHero('U000001');
 
-    const res = await handlers.pickNewSelection(event);
+    const res = await handlers.pickNewSelection();
 
     const expectedRes = {
       heroes: ['doe']
@@ -63,7 +58,7 @@ describe('Hero Scheduler', () => {
       .post('/', JSON.stringify(expectedSlackPayload))
       .reply(200, {});
 
-    const res = await handlers.notifySlackChannel(event);
+    const res = await handlers.notifySlackChannel();
 
     expect(res.statusCode).toBe(204);
   });
@@ -83,7 +78,7 @@ describe('Hero Scheduler', () => {
       .post('/', JSON.stringify(expectedSlackPayload))
       .reply(200, {});
 
-    const res = await handlers.pickAndNotify(event);
+    const res = await handlers.pickAndNotify();
 
     expect(res.statusCode).toBe(204);
   });
